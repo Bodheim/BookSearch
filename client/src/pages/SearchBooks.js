@@ -9,6 +9,7 @@ import {
   CardColumns,
 } from 'react-bootstrap';
 import { useMutation } from '@apollo/client';
+import { saveBook, searchGoogleBooks } from '../utils/API';
 import { SAVE_BOOK } from '../utils/mutations';
 import Auth from '../utils/auth';
 import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
@@ -39,9 +40,7 @@ const SearchBooks = () => {
     }
 
     try {
-      const response = await fetch(
-        `https://www.googleapis.com/books/v1/volumes?q=${searchInput}`
-      );
+      const response = await searchGoogleBooks(searchInput);
 
       if (!response.ok) {
         throw new Error('something went wrong!');
@@ -76,14 +75,13 @@ const SearchBooks = () => {
       return false;
     }
 
+    console.log('this is working');
     try {
       const { data } = await saveBook({
-        variables: { bookData: { ...bookToSave } },
+        variables: { bookData: bookToSave },
       });
-      console.log('hello');
-      if (!data) {
-        throw new Error('something went wrong!');
-      }
+
+      console.log(data);
 
       // if book successfully saves to user's account, save book id to state
       setSavedBookIds([...savedBookIds, bookToSave.bookId]);
